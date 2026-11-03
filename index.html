@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resenha 084 RN</title>
+<meta name="description" content="Resenha 084 RN — o melhor da resenha do Rio Grande do Norte.">
+<style>
+  :root {
+    --bg: #fafafa; --card: #fff; --text: #262626; --muted: #737373; --line: #dbdbdb;
+    --grad: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #000; --card: #121212; --text: #f5f5f5; --muted: #a8a8a8; --line: #262626; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.4; }
+  main { max-width: 935px; margin: 0 auto; padding: 24px 16px 48px; }
+
+  header { display: flex; gap: 32px; align-items: center; padding-bottom: 32px; }
+  .avatar { flex: none; width: 150px; height: 150px; border-radius: 50%; padding: 4px; background: var(--grad); }
+  .avatar span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--card); border: 4px solid var(--bg); font-size: 40px; font-weight: 700; }
+  .info h1 { font-size: 22px; font-weight: 400; margin-bottom: 12px; }
+  .stats { display: flex; gap: 28px; list-style: none; margin-bottom: 12px; }
+  .stats b { font-weight: 600; }
+  .bio { font-size: 15px; }
+  .bio strong { display: block; }
+  .btn { display: inline-block; margin-top: 14px; padding: 7px 24px; border-radius: 8px; background: #0095f6; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
+  .btn:hover { background: #1877f2; }
+
+  .tabs { border-top: 1px solid var(--line); text-align: center; padding: 14px 0; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .post { aspect-ratio: 1; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: clamp(14px, 3vw, 24px); text-align: center; padding: 8px; }
+  .p1 { background: linear-gradient(135deg, #f09433, #dc2743); }
+  .p2 { background: linear-gradient(135deg, #2193b0, #6dd5ed); }
+  .p3 { background: linear-gradient(135deg, #bc1888, #6a11cb); }
+  .p4 { background: linear-gradient(135deg, #11998e, #38ef7d); }
+  .p5 { background: linear-gradient(135deg, #f7971e, #ffd200); color: #262626; }
+  .p6 { background: linear-gradient(135deg, #434343, #000); }
+
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 32px; }
+
+  @media (max-width: 600px) {
+    header { flex-direction: column; text-align: center; gap: 16px; }
+    .avatar { width: 96px; height: 96px; }
+    .avatar span { font-size: 26px; }
+    .stats { justify-content: center; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="avatar"><span>084</span></div>
+    <div class="info">
+      <h1>resenha084rn</h1>
+      <ul class="stats">
+        <li><b>6</b> publicações</li>
+        <li><b>—</b> seguidores</li>
+        <li><b>—</b> seguindo</li>
+      </ul>
+      <div class="bio">
+        <strong>Resenha 084 RN</strong>
+        O melhor da resenha do Rio Grande do Norte 🌵<br>
+        📍 Natal / RN · DDD 084
+      </div>
+      <a class="btn" href="https://www.instagram.com/resenha084rn" target="_blank" rel="noopener">Seguir no Instagram</a>
+    </div>
+  </header>
+
+  <div class="tabs">Publicações</div>
+
+  <section class="grid" aria-label="Publicações">
+    <div class="post p1">Resenha 1</div>
+    <div class="post p2">Resenha 2</div>
+    <div class="post p3">Resenha 3</div>
+    <div class="post p4">Resenha 4</div>
+    <div class="post p5">Resenha 5</div>
+    <div class="post p6">Resenha 6</div>
+  </section>
+
+  <footer>© 2026 Resenha 084 RN · página de teste</footer>
+</main>
+</body>
+</html>
