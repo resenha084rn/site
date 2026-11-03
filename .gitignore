@@ -11,3 +11,7 @@ projeto_contexto.md
 .agent/tasks/auto.stop
 .agent/tasks/logs/
 .agent/tasks/auditorias/*.stderr.log
+
+# arquivos pessoais de trabalho (nao publicar)
+*.ogg
+/logo.jpg

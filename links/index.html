@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resenha084 | Links</title>
+<meta name="description" content="Todos os links do Resenha084: YouTube, Instagram e a agenda do samba em Natal.">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="../assets/img/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+<main class="lk">
+  <img class="logo" src="../assets/img/logo.jpg" alt="Resenha 084">
+  <h1 class="display">Resenha<span class="verde">084</span></h1>
+  <p class="bio" id="bio">Podcast · Entrevistas, música e histórias reais · Rio Grande do Norte 🎙️</p>
+  <div class="lista" id="lista"><div class="eq" aria-hidden="true"></div></div>
+  <p class="rodape">Toda história merece uma resenha!</p>
+</main>
+<script src="../assets/js/common.js"></script>
+<script>
+(async function () {
+  const E = R.esc, lista = document.getElementById('lista');
+  document.querySelector('.eq').innerHTML = '<i></i>'.repeat(12);
+  try {
+    const [{ links }, site] = await Promise.all([R.json('data/links.json'), R.json('data/site.json')]);
+    if (site.tagline) document.getElementById('bio').textContent = 'Podcast · ' + site.sobre.slice(0, 2).join(' ') + ' 🎙️';
+    const ativos = links.filter(l => l.ativo !== false);
+    lista.innerHTML = ativos.map(l => {
+      const ext = /^https?:/.test(l.url);
+      return `<a class="item ${l.destaque ? 'dest' : ''}" href="${E(l.url)}" ${ext ? 'target="_blank" rel="noopener"' : ''}>
+        <span class="ic">${E(l.icone || '🔗')}</span><span>${E(l.titulo)}</span><span class="ar">›</span></a>`;
+    }).join('') || '<p class="bio">Nenhum link por enquanto.</p>';
+  } catch (e) {
+    lista.innerHTML = '<p class="bio">Não consegui carregar os links agora. Tente de novo.</p>';
+  }
+})();
+</script>
+</body>
+</html>

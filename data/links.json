@@ -1,0 +1,7 @@
+{
+  "links": [
+    { "id": "l1", "titulo": "Assistir ao vivo no YouTube", "url": "https://youtube.com/@starttvlive", "icone": "🔴", "destaque": true, "ativo": true },
+    { "id": "l2", "titulo": "Agenda do Samba em Natal", "url": "../#agenda", "icone": "🎶", "destaque": false, "ativo": true },
+    { "id": "l3", "titulo": "Instagram @resenha084rn", "url": "https://www.instagram.com/resenha084rn", "icone": "📸", "destaque": false, "ativo": true }
+  ]
+}

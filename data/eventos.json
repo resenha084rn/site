@@ -1,0 +1,58 @@
+{
+  "eventos": [
+    {
+      "id": "e-ribeira",
+      "titulo": "Ribeira Bohemia",
+      "tipo": "unico",
+      "data": "2026-11-07",
+      "diaSemana": null,
+      "horario": "",
+      "local": "Arena das Donas",
+      "endereco": "Ribeira, Natal/RN",
+      "artistas": [],
+      "gratis": false,
+      "preco": "A confirmar",
+      "descricao": "Exemplo vindo do áudio — confirmar horário, artistas e valor.",
+      "mapa": "",
+      "ingresso": "",
+      "flyer": "",
+      "publicado": true
+    },
+    {
+      "id": "e-exemplo-1",
+      "titulo": "Roda de Samba (exemplo)",
+      "tipo": "unico",
+      "data": "2026-11-14",
+      "diaSemana": null,
+      "horario": "16:00",
+      "local": "Local de exemplo",
+      "endereco": "Rocas, Natal/RN",
+      "artistas": ["Artista 1", "Artista 2"],
+      "gratis": true,
+      "preco": "",
+      "descricao": "Evento de exemplo — apague no /admin.",
+      "mapa": "",
+      "ingresso": "",
+      "flyer": "",
+      "publicado": true
+    },
+    {
+      "id": "e-fixo-1",
+      "titulo": "Samba fixo (exemplo)",
+      "tipo": "fixo",
+      "data": "",
+      "diaSemana": 5,
+      "horario": "19:00",
+      "local": "Bar de exemplo",
+      "endereco": "Natal/RN",
+      "artistas": [],
+      "gratis": true,
+      "preco": "",
+      "descricao": "Samba que acontece toda semana — apague ou edite no /admin.",
+      "mapa": "",
+      "ingresso": "",
+      "flyer": "",
+      "publicado": true
+    }
+  ]
+}

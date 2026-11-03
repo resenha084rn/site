@@ -1,0 +1,13 @@
+{
+  "nome": "Resenha084",
+  "tagline": "Toda história merece uma resenha!",
+  "sobre": [
+    "Entrevistas, música e histórias reais.",
+    "Direto do Rio Grande do Norte.",
+    "Ao vivo toda quarta, às 20h30."
+  ],
+  "instagram": "https://www.instagram.com/resenha084rn",
+  "youtube": "https://youtube.com/@starttvlive",
+  "aoVivo": { "dia": 3, "hora": "20:30", "duracaoHoras": 2 },
+  "repo": { "owner": "resenha084rn", "name": "site", "branch": "main" }
+}
