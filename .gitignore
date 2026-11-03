@@ -1,0 +1,13 @@
+# Kit de IA (kitdev) — fora do git NESTE projeto (decisão: .agent/contracts/decisoes.md)
+.agent/
+CLAUDE.md
+projeto_contexto.md
+.gitattributes
+
+# Linhas exigidas pelo kit (redundantes com .agent/ acima; mantidas p/ o kitdev status não acusar FALTA)
+.agent/tasks/_sessao_atual.md
+.agent/tasks/sessions.jsonl
+.agent/tasks/auto.pid
+.agent/tasks/auto.stop
+.agent/tasks/logs/
+.agent/tasks/auditorias/*.stderr.log
