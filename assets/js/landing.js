@@ -46,8 +46,22 @@
   }
   tickLive(); setInterval(tickLive, 1000);
 
-  /* ---------- agenda ---------- */
+  /* ---------- próximo episódio ---------- */
   const hoje = R.hojeStr();
+  const ep = site.episodio;
+  if (ep && ep.data && ep.data >= hoje && (ep.convidado || ep.banner)) {
+    const d = R.parseData(ep.data), ehHoje = ep.data === hoje;
+    $('#ep').className = 'ep';
+    $('#ep').innerHTML = `${ep.banner ? `<img src="${E(R.url(ep.banner))}" alt="Banner do episódio com ${E(ep.convidado)}">` : ''}
+      <div><div class="k">${ehHoje ? 'É hoje!' : 'Próximo episódio'}</div>
+        <h3>${E(ep.convidado || 'Novo episódio')}</h3>
+        <p>📅 <b>${R.DIAS_CURTO[d.getUTCDay()]}, ${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}</b> às <b>${E(R.hora(ep.hora || av.hora))}</b></p>
+        ${ep.apresentador ? `<p>🎙️ Apresentação: <b>${E(ep.apresentador)}</b></p>` : ''}
+        ${site.transmissao ? `<p>📺 Transmissão: <b>${E(site.transmissao)}</b></p>` : ''}
+        <a class="btn btn-verde btn-sm" href="${E(site.youtube)}" target="_blank" rel="noopener">▶ Assistir no YouTube</a></div>`;
+  }
+
+  /* ---------- agenda ---------- */
   const publicados = eventos.filter(e => e.publicado !== false);
   const unicos = publicados.filter(e => e.tipo !== 'fixo' && e.data && e.data >= hoje)
     .sort((a, b) => (a.data + (a.horario || '99')).localeCompare(b.data + (b.horario || '99')));

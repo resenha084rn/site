@@ -362,6 +362,8 @@
   /* ---------- ABA: AJUSTES ---------- */
   function abaAjustes() {
     const av = site.aoVivo || { dia: 3, hora: '20:30' };
+    const ep = site.episodio || {};
+    let blobEp = null;
     $('#conteudo').innerHTML = `
       <form class="box" id="fSite"><h2 class="display" style="font-size:24px;margin-bottom:14px">Site</h2>
         <label>Frase principal<input name="tagline" value="${E(site.tagline)}"></label>
@@ -370,6 +372,15 @@
         <label>Instagram<input type="url" name="instagram" value="${E(site.instagram)}"></label>
         <div class="row2"><label>Ao vivo — dia<select name="dia">${R.DIAS.map((d, i) => `<option value="${i}" ${av.dia == i ? 'selected' : ''}>${d}</option>`).join('')}</select></label>
         <label>Horário<input type="time" name="hora" value="${E(av.hora)}"></label></div>
+        <h2 class="display" style="font-size:22px;margin:6px 0 12px">Próximo episódio</h2>
+        <p class="hint">Aparece em destaque no topo do site até a data passar. Deixe a data vazia pra esconder.</p>
+        <div class="flyer"><div class="prev" id="prevEp" style="${ep.banner ? `background-image:url('${E(R.url(ep.banner))}')` : ''}">${ep.banner ? '' : 'sem banner'}</div>
+          <input type="file" id="arqEp" accept="image/*">
+          <label for="arqEp" class="btn btn-ghost btn-sm" style="margin:0;cursor:pointer;display:inline-flex">📷 Trocar banner</label></div>
+        <div class="row2"><label>Data<input type="date" name="epData" value="${E(ep.data)}"></label>
+        <label>Horário<input type="time" name="epHora" value="${E(ep.hora || av.hora)}"></label></div>
+        <label>Convidado<input name="epConvidado" value="${E(ep.convidado)}"></label>
+        <label>Apresentação<input name="epApres" value="${E(ep.apresentador)}"></label>
         <button class="btn btn-verde" style="width:100%">Publicar</button></form>
       <form class="box" id="fSenha"><h2 class="display" style="font-size:24px;margin-bottom:14px">Trocar senha do painel</h2>
         <label>Nova senha (mín. 8 caracteres)<input type="password" name="n1" minlength="8" autocomplete="new-password" required></label>
@@ -380,10 +391,30 @@
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" id="trocaTk">Trocar token do GitHub</button>
           <button class="btn btn-ghost btn-sm" id="sair">Sair</button></div></div>`;
+    $('#arqEp').onchange = async () => {
+      const file = $('#arqEp').files[0]; if (!file) return;
+      try { blobEp = await comprimir(file, 1000); $('#prevEp').textContent = ''; $('#prevEp').style.backgroundImage = `url('${URL.createObjectURL(blobEp)}')`; }
+      catch (x) { toast('Não consegui ler essa imagem.', true); }
+    };
     $('#fSite').onsubmit = async ev => {
       ev.preventDefault(); const f = ev.target;
-      const novo = { ...site, tagline: f.tagline.value.trim(), sobre: f.sobre.value.split('\n').map(x => x.trim()).filter(Boolean), youtube: f.youtube.value.trim(), instagram: f.instagram.value.trim(), aoVivo: { ...(site.aoVivo || {}), dia: Number(f.dia.value), hora: f.hora.value || '20:30', duracaoHoras: (site.aoVivo && site.aoVivo.duracaoHoras) || 2 } };
-      try { await comBusy('Publicando…', () => gravarJSON('data/site.json', novo, 'admin: atualiza ajustes do site')); site = novo; toast('Publicado ✔'); } catch (x) { }
+      const novo = {
+        ...site, tagline: f.tagline.value.trim(), sobre: f.sobre.value.split('\n').map(x => x.trim()).filter(Boolean), youtube: f.youtube.value.trim(), instagram: f.instagram.value.trim(),
+        aoVivo: { ...(site.aoVivo || {}), dia: Number(f.dia.value), hora: f.hora.value || '20:30', duracaoHoras: (site.aoVivo && site.aoVivo.duracaoHoras) || 2 },
+        episodio: { data: f.epData.value, hora: f.epHora.value || '20:30', convidado: f.epConvidado.value.trim(), apresentador: f.epApres.value.trim(), banner: ep.banner || '' }
+      };
+      try {
+        await comBusy('Publicando…', async () => {
+          if (blobEp) {
+            const p = `uploads/ep-${Date.now().toString(36)}.jpg`;
+            shas[p] = undefined; await gravar(p, await blobB64(blobEp), 'admin: banner do episódio');
+            novo.episodio.banner = p;
+          }
+          await gravarJSON('data/site.json', novo, 'admin: atualiza ajustes do site');
+          if (blobEp && ep.banner && ep.banner.startsWith('uploads/')) { try { await apagar(ep.banner, 'admin: remove banner antigo'); } catch (x) { } }
+        });
+        site = novo; blobEp = null; toast('Publicado ✔ (~1 min)'); abaAjustes();
+      } catch (x) { }
     };
     $('#fSenha').onsubmit = async ev => {
       ev.preventDefault(); const f = ev.target;

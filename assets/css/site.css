@@ -71,6 +71,16 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
 .cont span { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 @keyframes pulso { 0% { box-shadow: 0 0 0 0 rgba(255,59,59,.7); } 100% { box-shadow: 0 0 0 12px rgba(255,59,59,0); } }
 
+/* próximo episódio */
+.ep { margin: 18px auto 0; max-width: 640px; display: grid; grid-template-columns: 170px 1fr; gap: 18px; align-items: center; text-align: left; border: 1px solid var(--line); border-radius: var(--r); background: var(--card); padding: 14px; }
+.ep img { width: 100%; border-radius: 12px; aspect-ratio: 4/5; object-fit: cover; }
+.ep .k { color: var(--verde); font-weight: 800; letter-spacing: 1.5px; font-size: 12px; text-transform: uppercase; }
+.ep h3 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 30px; line-height: 1.05; margin: 4px 0 10px; }
+.ep p { color: var(--muted); font-size: 14px; }
+.ep p b { color: var(--text); }
+.ep .btn { margin-top: 12px; }
+@media (max-width: 520px) { .ep { grid-template-columns: 1fr; } .ep img { aspect-ratio: auto; max-height: 360px; object-fit: contain; background: #0d0d0d; } }
+
 /* seções */
 section { padding: 56px 0; }
 .sec-head { margin-bottom: 26px; }
