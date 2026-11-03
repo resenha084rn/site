@@ -20,14 +20,17 @@
     },
     {
       "id": "e-exemplo-1",
-      "titulo": "Roda de Samba (exemplo)",
+      "titulo": "Roda de Samba (exemplo2)",
       "tipo": "unico",
       "data": "2026-11-14",
       "diaSemana": null,
       "horario": "16:00",
       "local": "Local de exemplo",
       "endereco": "Rocas, Natal/RN",
-      "artistas": ["Artista 1", "Artista 2"],
+      "artistas": [
+        "Artista 1",
+        "Artista 2"
+      ],
       "gratis": true,
       "preco": "",
       "descricao": "Evento de exemplo — apague no /admin.",
