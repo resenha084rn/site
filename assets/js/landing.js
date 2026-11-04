@@ -13,7 +13,7 @@
   /* ---------- textos do site ---------- */
   if (site.youtube) { $('#btnYt').href = site.youtube; $('#fYt').href = site.youtube; }
   if (site.instagram) $('#fIg').href = site.instagram;
-  $('#ano').textContent = new Date().getFullYear();
+  { const ini = 2026, atual = R.agoraBR().getUTCFullYear(); $('#ano').textContent = atual > ini ? `${ini}–${atual}` : String(ini); }
   $('#sobreLista').innerHTML = (site.sobre || []).map((t, i) => `<li><span>${['🎙️', '🎤', '📍', '🔴'][i % 4]}</span><span>${E(t)}</span></li>`).join('');
 
   /* ---------- equalizador ---------- */
