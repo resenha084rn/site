@@ -154,6 +154,9 @@ dialog::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(6px); }
 /* player de som */
 .som { position: fixed; right: 14px; bottom: 14px; z-index: 40; display: inline-flex; align-items: center; gap: 10px; padding: 6px 16px 6px 6px; border-radius: 99px; border: 1px solid var(--line); background: rgba(18,18,18,.92); backdrop-filter: blur(10px); box-shadow: 0 10px 30px -10px rgba(0,0,0,.8); transition: border-color .2s; }
 .som.on { border-color: var(--verde); }
+.som.espera { border-color: var(--verde); animation: pulso 1.6s infinite; }
+.som.espera::after { content: 'Toque p/ ouvir'; font: 700 12px var(--body); color: var(--verde2); white-space: nowrap; }
+.som.espera .som-vol { display: none; }
 .som-btn { width: 40px; height: 40px; flex: none; border-radius: 50%; border: 0; background: var(--card); color: var(--text); font-size: 18px; cursor: pointer; display: grid; place-items: center; }
 .som.on .som-btn { background: var(--verde); }
 .som-vol { -webkit-appearance: none; appearance: none; width: 96px; height: 6px; border-radius: 99px; padding: 0; border: 0; cursor: pointer;
