@@ -16,3 +16,8 @@ projeto_contexto.md
 *.ogg
 /logo.jpg
 /audio.m4a
+
+# segredos locais — nunca commitar
+.env
+.env.*
+/script_firebase.js

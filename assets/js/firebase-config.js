@@ -5,11 +5,11 @@
  * usa os arquivos data/*.json normalmente. */
 window.FB = {
   config: {
-    apiKey: 'COLE_AQUI',
+    apiKey: 'AIzaSyD0qXdq5K8blqs5vsJ_xDhCZwm5u4gUpK4',
     authDomain: 'resenha084.firebaseapp.com',
     projectId: 'resenha084',
     storageBucket: 'resenha084.firebasestorage.app',
-    messagingSenderId: 'COLE_AQUI',
-    appId: 'COLE_AQUI'
+    messagingSenderId: '1003843420887',
+    appId: '1:1003843420887:web:4c7779b82e76bd7dfae692'
   }
 };
