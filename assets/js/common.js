@@ -64,5 +64,40 @@
       a.download = nome; document.body.appendChild(a); a.click(); a.remove();
     }
   };
+  /* ---------- Firebase (leitura pública via REST, sem SDK nas páginas públicas) ---------- */
+  R.fbOk = () => { const c = window.FB && window.FB.config; return !!(c && c.apiKey && !/^COLE/.test(c.apiKey)); };
+  R.docFB = async (col, id) => {
+    const c = window.FB.config;
+    const r = await fetch(`https://firestore.googleapis.com/v1/projects/${c.projectId}/databases/(default)/documents/${col}/${encodeURIComponent(id)}?key=${c.apiKey}`);
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error('Firestore ' + r.status);
+    return (await r.json()).fields || {};
+  };
+  /* conteúdo do site: Firestore primeiro; se não configurado/vazio/fora do ar, cai no data/*.json */
+  R.conteudo = async (nome, fallback) => {
+    if (R.fbOk()) {
+      try { const f = await R.docFB('conteudo', nome); if (f && f.json) return JSON.parse(f.json.stringValue); }
+      catch (e) { console.warn('Firebase indisponível, usando JSON local', e); }
+    }
+    return R.json(fallback);
+  };
+  /* flyers: "fb:ID" = imagem guardada no Firestore (texto base64); outro valor = arquivo do repositório */
+  R.flyerData = async id => {
+    const k = 'r84_fl_' + id;
+    try { const c = localStorage.getItem(k); if (c) return c; } catch (e) { }
+    const f = R.fbOk() ? await R.docFB('flyers', id) : null;
+    const d = f && f.data && f.data.stringValue;
+    if (d) { try { localStorage.setItem(k, d); } catch (e) { } }
+    return d || '';
+  };
+  R.imgTag = (ref, alt) => String(ref).startsWith('fb:')
+    ? `<img data-fb="${R.esc(ref.slice(3))}" alt="${R.esc(alt)}">`
+    : `<img src="${R.esc(R.url(ref))}" alt="${R.esc(alt)}" loading="lazy">`;
+  R.hidratar = (root = document) => root.querySelectorAll('[data-fb]').forEach(async el => {
+    if (el.dataset.ok) return; el.dataset.ok = '1';
+    try { const d = await R.flyerData(el.dataset.fb); if (!d) return; if (el.tagName === 'IMG') el.src = d; else el.style.backgroundImage = `url('${d}')`; }
+    catch (e) { console.warn('flyer', e); }
+  });
+
   window.R = R;
 })();

@@ -20,6 +20,7 @@
   <div class="lista" id="lista"><div class="eq" aria-hidden="true"></div></div>
   <p class="rodape">Toda história merece uma resenha!</p>
 </main>
+<script src="../assets/js/firebase-config.js"></script>
 <script src="../assets/js/common.js"></script>
 <script src="../assets/js/som.js"></script>
 <script>
@@ -27,7 +28,7 @@
   const E = R.esc, lista = document.getElementById('lista');
   document.querySelector('.eq').innerHTML = '<i></i>'.repeat(12);
   try {
-    const [{ links }, site] = await Promise.all([R.json('data/links.json'), R.json('data/site.json')]);
+    const [{ links }, site] = await Promise.all([R.conteudo('links', 'data/links.json'), R.conteudo('site', 'data/site.json')]);
     if (site.tagline) document.getElementById('bio').textContent = 'Podcast · ' + site.sobre.slice(0, 2).join(' ') + ' 🎙️';
     const ativos = links.filter(l => l.ativo !== false);
     lista.innerHTML = ativos.map(l => {

@@ -4,7 +4,7 @@
   let site, eventos = [], filtro = 'prox';
 
   try {
-    [site, { eventos }] = await Promise.all([R.json('data/site.json'), R.json('data/eventos.json')]);
+    [site, { eventos }] = await Promise.all([R.conteudo('site', 'data/site.json'), R.conteudo('eventos', 'data/eventos.json')]);
   } catch (e) {
     $('#grade').innerHTML = '<div class="vazio">Não consegui carregar a agenda agora. Tente de novo em instantes.</div>';
     console.error(e); return;
@@ -52,13 +52,14 @@
   if (ep && ep.data && ep.data >= hoje && (ep.convidado || ep.banner)) {
     const d = R.parseData(ep.data), ehHoje = ep.data === hoje;
     $('#ep').className = 'ep';
-    $('#ep').innerHTML = `${ep.banner ? `<img src="${E(R.url(ep.banner))}" alt="Banner do episódio com ${E(ep.convidado)}">` : ''}
+    $('#ep').innerHTML = `${ep.banner ? R.imgTag(ep.banner, 'Banner do episódio com ' + ep.convidado) : ''}
       <div><div class="k">${ehHoje ? 'É hoje!' : 'Próximo episódio'}</div>
         <h3>${E(ep.convidado || 'Novo episódio')}</h3>
         <p>📅 <b>${R.DIAS_CURTO[d.getUTCDay()]}, ${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}</b> às <b>${E(R.hora(ep.hora || av.hora))}</b></p>
         ${ep.apresentador ? `<p>🎙️ Apresentação: <b>${E(ep.apresentador)}</b></p>` : ''}
         ${site.transmissao ? `<p>📺 Transmissão: <b>${E(site.transmissao)}</b></p>` : ''}
         <a class="btn btn-verde btn-sm" href="${E(site.youtube)}" target="_blank" rel="noopener">▶ Assistir no YouTube</a></div>`;
+    R.hidratar($('#ep'));
   }
 
   /* ---------- agenda ---------- */
@@ -75,7 +76,7 @@
   }
   function flyerHTML(e) {
     return e.flyer
-      ? `<img src="${E(R.url(e.flyer))}" alt="Flyer: ${E(e.titulo)}" loading="lazy">`
+      ? R.imgTag(e.flyer, 'Flyer: ' + e.titulo)
       : `<div class="ph"><img src="assets/img/logo.jpg" alt=""></div>`;
   }
   function render() {
@@ -93,7 +94,7 @@
           <span class="preco ${e.gratis ? 'free' : ''}">${E(R.preco(e))}</span>
         </div></button>`;
     }).join('') : `<div class="vazio">${filtro === 'prox' ? 'Nenhum evento cadastrado por enquanto. Volta já! 🎶' : 'Nada por aqui nesse filtro. Tente outro. 😉'}</div>`;
-    observar();
+    observar(); R.hidratar($('#grade'));
   }
   $('#chips').addEventListener('click', ev => {
     const b = ev.target.closest('.chip'); if (!b) return;
@@ -123,7 +124,7 @@
     const txtZap = `${e.titulo} — ${quando}${e.horario ? ' às ' + R.hora(e.horario) : ''} · ${e.local}\nAgenda do samba: ${location.origin}${location.pathname}#agenda`;
     modal.innerHTML = `<button class="fechar" aria-label="Fechar">✕</button>
       <div class="md">
-        <div class="fl">${e.flyer ? `<img src="${E(R.url(e.flyer))}" alt="Flyer: ${E(e.titulo)}">` : `<div class="ph"><img src="assets/img/logo.jpg" alt=""></div>`}</div>
+        <div class="fl">${e.flyer ? R.imgTag(e.flyer, 'Flyer: ' + e.titulo) : `<div class="ph"><img src="assets/img/logo.jpg" alt=""></div>`}</div>
         <div class="info">
           <h2 class="display">${E(e.titulo)}</h2>
           ${linha('📅', 'Quando', E(quando) + (e.horario ? ' · ' + E(R.hora(e.horario)) : ''))}
@@ -139,6 +140,7 @@
           </div>
         </div>
       </div>`;
+    R.hidratar(modal);
     modal.querySelector('.fechar').onclick = () => modal.close();
     modal.querySelector('#btnCal').onclick = () => R.baixar((e.titulo || 'evento').replace(/\W+/g, '-') + '.ics', R.ics(e, data), 'text/calendar');
     modal.showModal();
