@@ -21,6 +21,9 @@ service cloud.firestore {
     // Flyers (imagens em texto): qualquer um lê; editor e postador escrevem.
     match /flyers/{id} { allow read: if true; allow write: if ehPostador(); }
 
+    // Música de fundo (pedaços do arquivo em texto): qualquer um lê; só editor escreve.
+    match /audio/{id} { allow read: if true; allow write: if ehEditor(); }
+
     // Quem pode o quê: cada pessoa lê só o próprio papel; só editor mexe na equipe.
     match /papeis/{email} {
       allow read: if logado() && (request.auth.token.email == email || ehEditor());

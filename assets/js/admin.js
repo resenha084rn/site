@@ -300,6 +300,14 @@ async function abaAjustes() {
       <label>Convidado<input name="epConvidado" value="${E(ep.convidado)}"></label>
       <label>Apresentação<input name="epApres" value="${E(ep.apresentador)}"></label>
       <button class="btn btn-verde" style="width:100%">Publicar</button></form>
+    <form class="box" id="fAudio"><h2 class="display" style="font-size:24px;margin-bottom:6px">Música de fundo</h2>
+      <p class="hint">Toca sozinha no site em 15% (o visitante ajusta). Atual: <b>${E(site.audio && site.audio.off ? 'desligada' : (site.audio && site.audio.id ? site.audio.nome : 'música padrão do site'))}</b></p>
+      <label>Enviar nova música (MP3, M4A, OGG, WAV — até 5 MB)<input type="file" id="arqAudio" accept="audio/*,.mp3,.m4a,.aac,.ogg,.opus,.wav"></label>
+      <p class="hint">Dica: no iPhone o MP3 e o M4A tocam em qualquer versão; OGG pode falhar em iPhones antigos.</p>
+      <button class="btn btn-verde" style="width:100%">Enviar e publicar</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button type="button" class="btn btn-ghost btn-sm" id="audioOff">${site.audio && site.audio.off ? 'Ligar música' : 'Desligar música do site'}</button>
+        ${site.audio && site.audio.id ? '<button type="button" class="btn btn-ghost btn-sm" id="audioPadrao">Voltar à música padrão</button>' : ''}</div></form>
     <div class="box" id="equipe"><h2 class="display" style="font-size:24px;margin-bottom:6px">Equipe</h2>
       <p class="hint">Editor faz tudo. Postador só mexe na agenda. A pessoa entra com a conta Google deste e-mail.</p>
       <div id="listaEquipe">Carregando…</div>
@@ -327,6 +335,46 @@ async function abaAjustes() {
         if (blobEp && ep.banner) await apagarFlyer(ep.banner);
       });
       site = novo; toast('Publicado ✔'); abaAjustes();
+    } catch (x) { }
+  };
+
+  /* ---- música de fundo: o arquivo é cortado em pedaços de ~700 KB (limite de 1 MB por documento) ---- */
+  const MIME = { mp3: 'audio/mpeg', m4a: 'audio/mp4', aac: 'audio/aac', ogg: 'audio/ogg', oga: 'audio/ogg', opus: 'audio/ogg', wav: 'audio/wav', webm: 'audio/webm' };
+  const bytesB64 = u => { let s = ''; for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return btoa(s); };
+  async function apagarAudio(a) { for (let i = 0; i < (a.partes || 0); i++) { try { await deleteDoc(doc(db, 'audio', `${a.id}_${i}`)); } catch (x) { } } }
+  async function salvarSite(novo, msg) { await gravarConteudo('site', novo); site = novo; toast(msg); abaAjustes(); }
+
+  $('#fAudio').onsubmit = async ev => {
+    ev.preventDefault();
+    const file = $('#arqAudio').files[0];
+    if (!file) return toast('Escolha um arquivo de áudio.', true);
+    if (file.size > 5 * 1024 * 1024) return toast('Arquivo grande demais (máx. 5 MB). Use um MP3 mais leve.', true);
+    const ext = file.name.split('.').pop().toLowerCase();
+    const tipo = file.type && file.type.startsWith('audio/') ? file.type : (MIME[ext] || 'audio/mpeg');
+    try {
+      await comBusy('Enviando música…', async () => {
+        const b64 = bytesB64(new Uint8Array(await file.arrayBuffer()));
+        const id = novoId('a'), TAM = 700000, partes = Math.ceil(b64.length / TAM);
+        for (let i = 0; i < partes; i++) {
+          ocupado(true, `Enviando música… ${i + 1}/${partes}`);
+          await setDoc(doc(db, 'audio', `${id}_${i}`), { d: b64.slice(i * TAM, (i + 1) * TAM) });
+        }
+        const antigo = site.audio;
+        await gravarConteudo('site', (site = { ...site, audio: { id, nome: file.name, tipo, partes } }));
+        if (antigo && antigo.id) await apagarAudio(antigo);
+      });
+      toast('Música publicada ✔ Já toca no site'); abaAjustes();
+    } catch (x) { }
+  };
+  $('#audioOff').onclick = async () => {
+    try { await comBusy('Salvando…', () => gravarConteudo('site', (site = { ...site, audio: { ...(site.audio || {}), off: !(site.audio && site.audio.off) } }))); toast('Salvo ✔'); abaAjustes(); } catch (x) { }
+  };
+  const padrao = $('#audioPadrao');
+  if (padrao) padrao.onclick = async () => {
+    if (!confirm('Apagar a música enviada e voltar à música padrão do site?')) return;
+    try {
+      await comBusy('Voltando ao padrão…', async () => { const antigo = site.audio; await gravarConteudo('site', (site = { ...site, audio: null })); await apagarAudio(antigo); });
+      toast('Voltou à música padrão ✔'); abaAjustes();
     } catch (x) { }
   };
 

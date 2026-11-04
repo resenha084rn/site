@@ -74,13 +74,14 @@
     return (await r.json()).fields || {};
   };
   /* conteúdo do site: Firestore primeiro; se não configurado/vazio/fora do ar, cai no data/*.json */
-  R.conteudo = async (nome, fallback) => {
+  const memo = {};   // a mesma página/scripts reaproveitam a leitura (landing + som)
+  R.conteudo = (nome, fallback) => memo[nome] || (memo[nome] = (async () => {
     if (R.fbOk()) {
       try { const f = await R.docFB('conteudo', nome); if (f && f.json) return JSON.parse(f.json.stringValue); }
       catch (e) { console.warn('Firebase indisponível, usando JSON local', e); }
     }
     return R.json(fallback);
-  };
+  })());
   /* flyers: "fb:ID" = imagem guardada no Firestore (texto base64); outro valor = arquivo do repositório */
   R.flyerData = async id => {
     const k = 'r84_fl_' + id;

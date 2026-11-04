@@ -1,14 +1,14 @@
-/* Som de fundo com player (volume padrão 15%, ajustável).
- * Regra dos navegadores: som COM áudio só começa depois de um toque na página.
- * Então: tenta tocar com som; se bloquear, inicia MUDO na hora (isso é permitido) e
- * liga o som sozinho no primeiro toque/clique/tecla do visitante. Quem desligou fica desligado. */
+/* Som de fundo com player (volume padrão 15%, ajustável). A música vem do admin (Firestore);
+ * sem música cadastrada, usa assets/audio/fundo.m4a. Pode ser desligada no admin.
+ * Regra dos navegadores: som COM áudio só começa depois de um toque na página. Então: tenta tocar
+ * com som; se bloquear, inicia MUDO e liga o som no primeiro toque/clique/tecla. Quem desligou fica desligado. */
 (function () {
-  const src = new URL('../audio/fundo.m4a', document.currentScript.src).href;
+  const PADRAO_SRC = new URL('../audio/fundo.m4a', document.currentScript.src).href;
   const K_OFF = 'r84_som_off', K_VOL = 'r84_som_vol15', K_T = 'r84_som_t';
   const PADRAO = 0.15;
   const safe = (f, d) => { try { return f(); } catch (e) { return d; } };
 
-  const audio = new Audio(src);
+  const audio = new Audio();
   audio.loop = true; audio.preload = 'auto';
   const salvo = safe(() => localStorage.getItem(K_VOL), null);
   audio.volume = salvo === null ? PADRAO : Math.min(1, Math.max(0, Number(salvo)));
@@ -22,6 +22,28 @@
   vol.value = Math.round(audio.volume * 100);
   vol.style.setProperty('--p', vol.value + '%');
 
+  /* descobre qual música tocar (junta os pedaços do Firestore; guarda no cache do navegador) */
+  async function srcFirebase(a) {
+    const chave = new Request(location.origin + '/__audio/' + a.id);
+    let cache = null;
+    try { cache = await caches.open('r84-audio'); const r = await cache.match(chave); if (r) return URL.createObjectURL(await r.blob()); } catch (e) { }
+    const partes = await Promise.all(Array.from({ length: a.partes }, (_, i) => R.docFB('audio', a.id + '_' + i)));
+    const b64 = partes.map(f => f.d.stringValue).join('');
+    const blob = await (await fetch(`data:${a.tipo || 'audio/mpeg'};base64,${b64}`)).blob();
+    try { if (cache) { await cache.keys().then(ks => ks.forEach(k => { if (k.url !== chave.url) cache.delete(k); })); await cache.put(chave, new Response(blob)); } } catch (e) { }
+    return URL.createObjectURL(blob);
+  }
+  const pronto = (async () => {
+    let site = null;
+    try { site = await R.conteudo('site', 'data/site.json'); } catch (e) { }
+    const a = site && site.audio;
+    if (a && a.off) { box.remove(); return false; }          // música desligada no admin
+    let src = PADRAO_SRC;
+    if (a && a.id) { try { src = await srcFirebase(a); } catch (e) { console.warn('música do Firebase indisponível, usando a padrão', e); } }
+    audio.src = src;
+    return true;
+  })();
+
   function ui() {
     const tocando = !audio.paused && !audio.muted;
     box.classList.toggle('on', tocando);
@@ -32,6 +54,7 @@
   }
 
   async function tocar(comSom) {
+    if (!(await pronto)) return 'bloqueado';
     const t = Number(safe(() => sessionStorage.getItem(K_T), 0)) || 0;
     if (t && !audio.currentTime) audio.addEventListener('loadedmetadata', () => { try { audio.currentTime = t % (audio.duration || 1e9); } catch (e) { } }, { once: true });
     audio.muted = false;
@@ -55,22 +78,20 @@
   addEventListener('pagehide', () => safe(() => sessionStorage.setItem(K_T, audio.currentTime)));
   ui();
 
-  /* início automático */
+  /* início automático: qualquer toque/clique/tecla em QUALQUER lugar tenta ligar o som;
+   * só para quando o som entra de verdade (rolar a tela não conta como gesto pro navegador) */
   if (safe(() => localStorage.getItem(K_OFF), null) !== '1') {
-    tocar(false).then(estado => {
-      if (estado === 'som') return;
-      /* qualquer toque/clique/tecla em QUALQUER lugar tenta ligar o som; só para quando o som entra de verdade
-       * (rolar a tela não conta como gesto pro navegador, então insistimos a cada toque) */
-      const ev = ['pointerdown', 'pointerup', 'mouseup', 'click', 'touchend', 'keydown'];
-      const parar = () => ev.forEach(e => removeEventListener(e, go, true));
-      const go = async () => {
-        if (safe(() => localStorage.getItem(K_OFF), null) === '1') return parar();
-        audio.muted = false;
-        try { await audio.play(); } catch (e) { audio.muted = true; audio.play().catch(() => { }); ui(); return; }
-        ui();
-        if (!audio.paused && !audio.muted) parar();
-      };
-      ev.forEach(e => addEventListener(e, go, true));
-    });
+    const ev = ['pointerdown', 'pointerup', 'mouseup', 'click', 'touchend', 'keydown'];
+    const parar = () => ev.forEach(e => removeEventListener(e, go, true));
+    const go = async () => {
+      if (safe(() => localStorage.getItem(K_OFF), null) === '1') return parar();
+      if (!(await pronto)) return parar();
+      audio.muted = false;
+      try { await audio.play(); } catch (e) { audio.muted = true; audio.play().catch(() => { }); ui(); return; }
+      ui();
+      if (!audio.paused && !audio.muted) parar();
+    };
+    ev.forEach(e => addEventListener(e, go, true));
+    tocar(false).then(estado => { if (estado === 'som') parar(); });
   }
 })();
