@@ -59,12 +59,16 @@
   if (safe(() => localStorage.getItem(K_OFF), null) !== '1') {
     tocar(false).then(estado => {
       if (estado === 'som') return;
-      const ev = ['pointerdown', 'touchend', 'keydown'];
-      const go = () => {
-        ev.forEach(e => removeEventListener(e, go, true));
-        if (safe(() => localStorage.getItem(K_OFF), null) === '1') return;
+      /* qualquer toque/clique/tecla em QUALQUER lugar tenta ligar o som; só para quando o som entra de verdade
+       * (rolar a tela não conta como gesto pro navegador, então insistimos a cada toque) */
+      const ev = ['pointerdown', 'pointerup', 'mouseup', 'click', 'touchend', 'keydown'];
+      const parar = () => ev.forEach(e => removeEventListener(e, go, true));
+      const go = async () => {
+        if (safe(() => localStorage.getItem(K_OFF), null) === '1') return parar();
         audio.muted = false;
-        if (audio.paused) tocar(true); else ui();
+        try { await audio.play(); } catch (e) { audio.muted = true; audio.play().catch(() => { }); ui(); return; }
+        ui();
+        if (!audio.paused && !audio.muted) parar();
       };
       ev.forEach(e => addEventListener(e, go, true));
     });
