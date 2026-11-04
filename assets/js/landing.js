@@ -13,6 +13,7 @@
   /* ---------- textos do site ---------- */
   if (site.youtube) { $('#btnYt').href = site.youtube; $('#fYt').href = site.youtube; }
   if (site.instagram) $('#fIg').href = site.instagram;
+  $('#goAdmin').addEventListener('click', () => { location.href = 'admin/'; });   // atalho discreto: só o "084" abre o admin
   { const ini = 2026, atual = R.agoraBR().getUTCFullYear(); $('#ano').textContent = atual > ini ? `${ini}–${atual}` : String(ini); }
   $('#sobreLista').innerHTML = (site.sobre || []).map((t, i) => `<li><span>${['🎙️', '🎤', '📍', '🔴'][i % 4]}</span><span>${E(t)}</span></li>`).join('');
 
